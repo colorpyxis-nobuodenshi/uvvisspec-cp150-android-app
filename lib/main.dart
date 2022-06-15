@@ -41,7 +41,6 @@ class HomeState extends State<Home> {
   var _peekPower = 0.0;
   var _peekWavelength = 0.0;
   var _irradiance = 0.0;
-  var _unit = "W/m2";
 
   late List<double> _spectralData = List.generate(50, (index) => 1.0);
   late List<double> _spectralWl = List.generate(50, (index) => 0.0);
@@ -126,7 +125,7 @@ class HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('UVVIS Spectrometer'),
+        title: const Text('UVVIS分光放射照度計CP150'),
         actions: <Widget>[
            //(_connected) ? const Icon(Icons.check_circle_outline) : const Icon(Icons.highlight_off_outlined),
            (_showWarning) ? const Icon(Icons.warning) : const SizedBox.shrink(),
@@ -139,13 +138,12 @@ class HomeState extends State<Home> {
                 context, MaterialPageRoute(builder: (context) => SettingsPage(_settings)));
 
                 setState(() {
-                  _unit = unitMap[_settings.unit]!;
+                  
                 });
 
                 if(_settings.deviceExposureTime != prevExp) {
                   await device.changeExposureTime(_settings.deviceExposureTime);
                 }
-                //debugPrint(_settings.deviceExposureTime);
                 
                 await device.measStart();
             },
@@ -158,66 +156,19 @@ class HomeState extends State<Home> {
             children: <Widget>[
         SizedBox(
           width: 700,
-          height: 240,
+          height: 250,
           child: Card(
             child: SpectralLineChart.create(_spectralWl, _spectralData, _settings.sumRangeMin, _settings.sumRangeMax),
           ) 
         ),
-          SizedBox(
-          height: 100,
-          width: 700,
-          child: Card(
-              child: Column(
-                children: <Widget>[
-                  const Text("ピーク光強度", 
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                    ),
-                  Text(_peekPower.toStringAsExponential(3), 
-                        style:  TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 36,
-                          color: Colors.blue.shade600,
-                          ),
-                      ),
-                  Text(_unit+"/nm", style: const TextStyle(fontSize: 18)),
-                  
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-          height: 100,
-          width: 700,
-          child: Card(
-              child: Column(
-                children: <Widget>[
-                  const Text("ピーク波長", 
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                    ),
-                  Text(_peekWavelength.toStringAsFixed(0), 
-                        style:  TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 36,
-                          color: Colors.blue.shade600,
-                          ),
-                      ),
-                  const Text("nm", style: TextStyle(fontSize: 18)),
-                  
-                ],
-              ),
-            ),
-          ),
         SizedBox(
-          height: 100,
+          height: 120,
           width: 700,
           child: Card(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  const Text("総光強度",
+                  const Text("放射照度",
                     style: TextStyle(fontSize: 18),
                     ),
                   Text(_irradiance.toStringAsExponential(3), 
@@ -227,11 +178,60 @@ class HomeState extends State<Home> {
                           color: Colors.blue.shade600,
                           ),
                       ),
-                  Text(_unit, style: const TextStyle(fontSize: 18)),
+                  const Text("W\u2219m\u207B\u00B2", style: TextStyle(fontSize: 18)),
                 ],
               ),
             ),
           ),
+          SizedBox(
+          height: 90,
+          width: 700,
+          child: Card(
+              child: Column(
+                children: <Widget>[
+                  const Text("ピーク光強度", 
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                    ),
+                  Text(_peekPower.toStringAsExponential(3), 
+                        style:  TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 28,
+                          color: Colors.blue.shade600,
+                          ),
+                      ),
+                  const Text("W\u2219m\u207B\u00B2\u2219nm\u207B\u00B9", style: TextStyle(fontSize: 16)),
+                  
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+          height: 90,
+          width: 700,
+          child: Card(
+              child: Column(
+                children: <Widget>[
+                  const Text("ピーク波長", 
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                    ),
+                  Text(_peekWavelength.toStringAsFixed(0), 
+                        style:  TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 28,
+                          color: Colors.blue.shade600,
+                          ),
+                      ),
+                  const Text("nm", style: TextStyle(fontSize: 16)),
+                  
+                ],
+              ),
+            ),
+          ),
+        
           Container(
             margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
            child: Row(
@@ -383,7 +383,7 @@ class SpectralLineChart extends StatelessWidget {
       charts.Series<LinearSpectral, int>(
         id: 'SpectralData',
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        // areaColorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+        areaColorFn: (_, __) => charts.MaterialPalette.transparent,
         domainFn: (LinearSpectral sp, _) => sp.waveLength.toInt(),
         measureFn: (LinearSpectral sp, _) => sp.opticalPower,
         data: l,
@@ -417,15 +417,22 @@ class SpectralLineChart extends StatelessWidget {
         ),
         behaviors: [
           charts.RangeAnnotation([
-            // charts.RangeAnnotationSegment(330, sumRangeMin, charts.RangeAnnotationAxisType.domain, color: charts.ColorUtil.fromDartColor(Colors.white10)),
-            // charts.RangeAnnotationSegment(sumRangeMax, 800, charts.RangeAnnotationAxisType.domain, color: charts.ColorUtil.fromDartColor(Colors.white10)),
-            charts.RangeAnnotationSegment(sumRangeMin, sumRangeMax, charts.RangeAnnotationAxisType.domain, color: charts.ColorUtil.fromDartColor(Colors.white10)),
-            // charts.LineAnnotationSegment(
-            // sumRangeMin, charts.RangeAnnotationAxisType.domain,
-            // color: charts.ColorUtil.fromDartColor(Colors.black12), strokeWidthPx: 3),
-            // charts.LineAnnotationSegment(
-            // sumRangeMax, charts.RangeAnnotationAxisType.domain,
-            // color: charts.ColorUtil.fromDartColor(Colors.black12), strokeWidthPx: 3),
+            charts.LineAnnotationSegment(
+            sumRangeMin, charts.RangeAnnotationAxisType.domain,
+            color: charts.ColorUtil.fromDartColor(Colors.white), strokeWidthPx: 2,
+            startLabel: sumRangeMin.toInt().toString() + "",
+            labelStyleSpec: const charts.TextStyleSpec(
+            color: charts.MaterialPalette.white),
+            //labelDirection: charts.AnnotationLabelDirection.horizontal
+            ),
+            charts.LineAnnotationSegment(
+            sumRangeMax, charts.RangeAnnotationAxisType.domain,
+            color: charts.ColorUtil.fromDartColor(Colors.white), strokeWidthPx: 2,
+            endLabel: sumRangeMax.toInt().toString() + "",
+            labelStyleSpec: const charts.TextStyleSpec(
+            color: charts.MaterialPalette.white),
+            //labelDirection: charts.AnnotationLabelDirection.horizontal
+            ),
             ]),
               ],
           );

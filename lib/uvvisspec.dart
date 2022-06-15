@@ -21,17 +21,17 @@ class ResultReport {
   String unit = "";
 }
 
-Map<Unit, String> unitMap = {
-  Unit.w : "W/m2",
-  Unit.photon : "photons/m2/s",
-  Unit.mol : "umol/m2/s",
-};
+// Map<Unit, String> unitMap = {
+//   Unit.w : "W/m2",
+//   Unit.photon : "photons/m2/s",
+//   Unit.mol : "umol/m2/s",
+// };
 
 class Settings {
-  Unit unit = Unit.w;
   double sumRangeMin = 330;
   double sumRangeMax = 800;
   String deviceExposureTime = "AUTO";
+  int integ = 1;
 }
 
 enum Unit {
@@ -45,26 +45,9 @@ class UVVisSpecResultConverter {
 
     var report = ResultReport();
 
-    final unit = settings.unit;
     final wl = [...result.wl];
     var sp = [...result.sp];
     
-    if(unit == Unit.w) {
-      for(int i=0;i<sp.length;i++){
-        sp[i] = sp[i];
-      }
-    }
-    else if(unit == Unit.photon) {
-
-      for(int i=0;i<sp.length;i++){
-        sp[i] = sp[i] * wl[i] * 5.03E+15;
-      }
-    }
-    else if(unit == Unit.mol) {
-      for(int i=0;i<sp.length;i++){
-        sp[i] = sp[i] * wl[i] / 0.1237 * 10E-3;
-      }
-    }
     var sp2 = [...sp];
     final l1 = settings.sumRangeMin;
     final l2 = settings.sumRangeMax;
@@ -91,7 +74,6 @@ class UVVisSpecResultConverter {
     report.pwl = pwl;
     report.wlRangeMin = l1;
     report.wlRangeMax = l2;
-    report.unit = unitMap[unit]!;
 
     return report;
   }

@@ -19,9 +19,8 @@ class ResultStorage{
       final mdt = result.measureDatetime;
       final pp = result.pp;
       final pw = result.pwl;
-      final unit = result.unit;
-      await file.writeAsString('Measure date, $mdt\r\n', mode: FileMode.append);
-      await file.writeAsString('[nm], [$unit]\r\n', mode: FileMode.append);
+      await file.writeAsString('測定日, $mdt\r\n', mode: FileMode.append);
+      await file.writeAsString('波長[nm], 放射照度[W/m^-2]\r\n', mode: FileMode.append);
       for(var i=0;i<len;i++){
         final v1 = wl[i];
         final v2 = sp[i];

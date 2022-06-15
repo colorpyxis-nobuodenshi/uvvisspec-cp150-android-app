@@ -12,11 +12,12 @@ class SettingsPage extends StatefulWidget {
 
 class SettingsPageState extends State<SettingsPage> {
 
-  var _unitSel = Unit.w;
   var _wlSumMin = "";
   var _wlSumMax = "";
   var _wlRangeValues = const RangeValues(0.33, 0.8);
   var _exposuretime = "";
+  //var _integ = "";
+  //var _integTec = TextEditingController();
   @override
   void initState() {
     // TODO: implement initState
@@ -26,9 +27,11 @@ class SettingsPageState extends State<SettingsPage> {
     _wlSumMin = settings.sumRangeMin.toInt().toString();
     _wlSumMax = settings.sumRangeMax.toInt().toString();
     _wlRangeValues = RangeValues(settings.sumRangeMin / 1000.0, settings.sumRangeMax / 1000.0);
+    //_integ = settings.integ.toString();
     setState(() {
-      _unitSel = settings.unit;
       _exposuretime = settings.deviceExposureTime;
+      //_integTec = TextEditingController(text: _integ);
+      //_integTec.selection = TextSelection.fromPosition(TextPosition(offset: _integ.length));
     });
   }
 
@@ -43,27 +46,17 @@ class SettingsPageState extends State<SettingsPage> {
     return WillPopScope(
       onWillPop: () {
         Settings s = Settings();
-        s.unit = _unitSel;
         s.sumRangeMin = double.parse(_wlSumMin);
         s.sumRangeMax = double.parse(_wlSumMax);
         s.deviceExposureTime = _exposuretime;
-        // if(_unitSel == Unit.w || _unitSel == Unit.photon)
-        // {
-        //   s.sumRangeMin = 330;
-        //   s.sumRangeMax = 800;
-        // }
-        // else
-        // {
-        //   s.sumRangeMin = 400;
-        //   s.sumRangeMax = 700;
-        // }
+        //s.integ = int.parse(_integ.trim());
         Navigator.of(context).pop(s);
 
         return Future.value(false);
       },
       child : Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text('設定'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
@@ -78,16 +71,6 @@ class SettingsPageState extends State<SettingsPage> {
         children: <Widget>[
           Column(
             children: [
-              Card(
-                child: Column(
-                children: <Widget>[
-                  const Text("光強度単位"),
-              RadioListTile(title: const Text("W/m2"), value: Unit.w, groupValue: _unitSel, onChanged: (value) => { setState(()=>{_unitSel = Unit.w })}),
-              RadioListTile(title: const Text("photons/m2/s"), value: Unit.photon, groupValue: _unitSel, onChanged: (value) => { setState(()=>{_unitSel = Unit.photon })}),
-              RadioListTile(title: const Text("mol/m2/s"), value: Unit.mol, groupValue: _unitSel, onChanged: (value) => { setState(()=>{_unitSel = Unit.mol })}),
-                ],
-              ),
-              ),
               Card(
                 child: Column(
                 children: <Widget>[
@@ -126,7 +109,6 @@ class SettingsPageState extends State<SettingsPage> {
                     ],
                   ),
                   Center(
-                    // width: 280,
                     child: RangeSlider(values: _wlRangeValues,
                       activeColor: Colors.blueGrey,
                       inactiveColor: Colors.blueGrey.shade800,
@@ -135,8 +117,6 @@ class SettingsPageState extends State<SettingsPage> {
                           _wlRangeValues = values;
                           _wlSumMin = (_wlRangeValues.start * 1000).toInt().toString();
                           _wlSumMax = (_wlRangeValues.end * 1000).toInt().toString();
-                          // _wlSumMinEditingController = TextEditingController(text: _wlSumMin);
-                          // _wlSumMaxEditingController = TextEditingController(text: _wlSumMax);
                         });
                       },
                       min: 0.33,
@@ -146,8 +126,20 @@ class SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
-              
               ),
+              // Card(
+              //   child: Column(
+              //   children: <Widget>[
+              //     const Text("時間積算"),
+              //     TextField(
+              //       controller: _integTec,
+              //       //textAlign: TextAlign.right,
+              //       keyboardType: TextInputType.number,
+              //       onChanged: (value) => _integ = value,
+              //     )
+              //   ]
+              //   ),
+              // ),
               Card(
                 child: Column(
                 children: <Widget>[
