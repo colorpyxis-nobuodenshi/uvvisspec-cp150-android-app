@@ -125,7 +125,7 @@ class HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('UVVIS分光放射照度計CP150'),
+        title: const Text('UVaVIS分光放射照度計CP150'),
         actions: <Widget>[
            //(_connected) ? const Icon(Icons.check_circle_outline) : const Icon(Icons.highlight_off_outlined),
            (_showWarning) ? const Icon(Icons.warning) : const SizedBox.shrink(),
@@ -171,7 +171,7 @@ class HomeState extends State<Home> {
                   const Text("放射照度",
                     style: TextStyle(fontSize: 18),
                     ),
-                  Text(_irradiance.toStringAsPrecision(3), 
+                  Text(_irradiance * 1000 < 1 ? _irradiance.toStringAsExponential(4) : _irradiance.toStringAsPrecision(4), 
                         style:  TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 36,
@@ -194,7 +194,7 @@ class HomeState extends State<Home> {
                       fontSize: 16,
                     ),
                     ),
-                  Text(_peekPower.toStringAsExponential(3), 
+                  Text(_peekPower * 1000 < 1 ? _peekPower.toStringAsExponential(4) : _peekPower.toStringAsPrecision(4), 
                         style:  TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 28,

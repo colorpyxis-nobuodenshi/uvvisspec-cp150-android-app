@@ -18,7 +18,7 @@ class ResultReport {
   double wlRangeMin = 330;
   double wlRangeMax = 800;
   String measureDatetime = "";
-  String unit = "";
+  //String unit = "W\u2219m\u207B\u00B2\u2219nm\u207B\u00B9";
 }
 
 // Map<Unit, String> unitMap = {
@@ -34,11 +34,11 @@ class Settings {
   int integ = 1;
 }
 
-enum Unit {
-  w,
-  photon,
-  mol
-}
+// enum Unit {
+//   w,
+//   photon,
+//   mol
+// }
 
 class UVVisSpecResultConverter {
   Future<ResultReport> execute(Settings settings, UVVisSpecDeviceResult result) async {
@@ -150,6 +150,9 @@ class UvVisSpecDevice {
   }
 
   Future<void> measStart() async {  
+    if(_status.connected == false) {
+      return;
+    }
     _timer = Timer.periodic(const Duration(milliseconds:200),
      (timer) async {
 

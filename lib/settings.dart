@@ -94,7 +94,7 @@ class SettingsPageState extends State<SettingsPage> {
                         ),
                         onPressed: () {
                           setState(() {
-                              _wlRangeValues = const RangeValues(0.31, 0.8);
+                              _wlRangeValues = const RangeValues(0.33, 0.8);
                               _wlSumMin = (_wlRangeValues.start * 1000).toInt().toString();
                               _wlSumMax = (_wlRangeValues.end * 1000).toInt().toString();
                             });
