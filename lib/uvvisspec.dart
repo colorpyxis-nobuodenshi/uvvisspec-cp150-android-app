@@ -105,12 +105,6 @@ class UvVisSpecDevice {
   Transaction<String>? _transaction;
   Timer? _timer;
 
-  // static int UVMINISPEC_SENSOR_NUM = 288;
-  // late List<double> _spectralDataRaw;
-  // late List<double> _spectralWlRaw;
-  // late List<double> _darkRaw;
-  // late List<double> _spectralIntensityRaw;
-
   var _status = UVVisSpecDeviceStatus();
   final _resultSubject = PublishSubject<UVVisSpecDeviceResult>();
   final _statusSubject = PublishSubject<UVVisSpecDeviceStatus>();
@@ -156,7 +150,7 @@ class UvVisSpecDevice {
   }
 
   Future<void> measStart() async {  
-    _timer = Timer.periodic(const Duration(milliseconds:500),
+    _timer = Timer.periodic(const Duration(milliseconds:200),
      (timer) async {
 
         if(_measuring) {
@@ -168,10 +162,9 @@ class UvVisSpecDevice {
         }
         if(_status.measurestarted){
           _measuring = true;
-          meas().then((value) {
-            status();
-            _measuring = false;
-          });
+          await meas();
+          await status();
+          _measuring = false;
         }
         
       });
@@ -192,6 +185,8 @@ class UvVisSpecDevice {
     {
       var res = await _transaction?.transaction(_port!, const AsciiEncoder().convert('MEAS\n'), const Duration(seconds: 60));
       if(res == null) {
+        _status.detached = true;
+        _statusSubject.add(_status);
         return;
       }
       var values = res.split('\r');

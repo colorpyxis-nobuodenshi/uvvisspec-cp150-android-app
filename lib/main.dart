@@ -171,7 +171,7 @@ class HomeState extends State<Home> {
                   const Text("放射照度",
                     style: TextStyle(fontSize: 18),
                     ),
-                  Text(_irradiance.toStringAsExponential(3), 
+                  Text(_irradiance.toStringAsPrecision(3), 
                         style:  TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 36,
