@@ -17,6 +17,8 @@ class ResultReport {
   List<double> wlRaw = [];
   double wlRangeMin = 330;
   double wlRangeMax = 800;
+  int integ = 1;
+  double ai = 0.0;
   String measureDatetime = "";
   //String unit = "W\u2219m\u207B\u00B2\u2219nm\u207B\u00B9";
 }
@@ -31,7 +33,7 @@ class Settings {
   double sumRangeMin = 330;
   double sumRangeMax = 800;
   String deviceExposureTime = "AUTO";
-  int integ = 1;
+  int integ = 10;
 }
 
 // enum Unit {
@@ -45,33 +47,35 @@ class UVVisSpecResultConverter {
 
     var report = ResultReport();
 
+    final integ = settings.integ;
+    var ai = 0.0;
     final wl = [...result.wl];
     var sp = [...result.sp];
-    
     var sp2 = [...sp];
     final l1 = settings.sumRangeMin;
     final l2 = settings.sumRangeMax;
     for(var i=0; i<wl.length; i++) {
       if(wl[i] < l1){
-        sp[i] = 0;
+        sp2[i] = 0;
       }
       if(wl[i] > l2){
-        sp[i] = 0;
+        sp2[i] = 0;
       }
     }
-    var pp = sp.reduce(max);
-    var pwl = wl[sp.indexWhere((x) => (x == pp))];
+    var pp = sp2.reduce(max);
+    var pwl = wl[sp2.indexWhere((x) => (x == pp))];
     var ir = 0.0;
 
     for(var i=0; i<wl.length; i++) {
-      ir += sp[i];
+      ir += sp2[i];
     }
-
-    report.sp = sp2;
+    ai = ir * integ;
+    report.sp = sp;
     report.wl = wl;
     report.ir = ir;
     report.pp = pp;
     report.pwl = pwl;
+    report.ai = ai;
     report.wlRangeMin = l1;
     report.wlRangeMax = l2;
 
@@ -426,9 +430,9 @@ class UvVisSpecDevice {
 
   double _interporateLagrange(double x, List<double> xa, List<double> ya)
   {
-      var t1 = 1;
+      var t1 = 2;
 
-      for(var i=1;i<xa.length-2;i++)
+      for(var i=2;i<xa.length-1;i++)
       {
           t1 = i;
           if(xa[i] > x)
@@ -436,8 +440,8 @@ class UvVisSpecDevice {
             break;
           }
       }
-      var xx = [xa[t1-1],xa[t1],xa[t1+1],xa[t1+2]];
-      var yy = [ya[t1-1],ya[t1],ya[t1+1],ya[t1+2]];
+      var xx = [xa[t1-2],xa[t1-1],xa[t1],xa[t1+1]];
+      var yy = [ya[t1-2],ya[t1-1],ya[t1],ya[t1+1]];
       var p = 0.0;
       var s = 0.0;
       for(var j=0;j<xx.length;j++)

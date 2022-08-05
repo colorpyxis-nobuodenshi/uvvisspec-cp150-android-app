@@ -40,7 +40,8 @@ class HomeState extends State<Home> {
   var _peekPower = 0.0;
   var _peekWavelength = 0.0;
   var _irradiance = 0.0;
-
+  var _accumulatedIrradiance = 0.0;
+  var _integ = 1;
   late List<double> _spectralData = List.generate(50, (index) => 1.0);
   late List<double> _spectralWl = List.generate(50, (index) => 0.0);
   late ResultReport _currentResult = ResultReport();
@@ -94,6 +95,7 @@ class HomeState extends State<Home> {
       var pp1 = _currentResult.pp;
       var ir1 = _currentResult.ir;
       var pwl1 = _currentResult.pwl;
+      var ai = _currentResult.ai;
       for (var i = 0; i < p1.length; i++) {
         p1[i] /= pp1;
       }
@@ -103,6 +105,7 @@ class HomeState extends State<Home> {
         _irradiance = ir1;
         _peekWavelength = pwl1;
         _peekPower = pp1;
+        _accumulatedIrradiance = ai;
       });
     });
 
@@ -140,7 +143,9 @@ class HomeState extends State<Home> {
                   MaterialPageRoute(
                       builder: (context) => SettingsPage(_settings)));
 
-              setState(() {});
+              setState(() {
+                _integ = _settings.integ;
+              });
 
               if (_settings.deviceExposureTime != prevExp) {
                 await device.changeExposureTime(_settings.deviceExposureTime);
@@ -170,7 +175,7 @@ class HomeState extends State<Home> {
               children: <Widget>[
                 const Text(
                   "放射照度",
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 16),
                 ),
                 Text(
                   _irradiance * 1000 < 1
@@ -183,39 +188,68 @@ class HomeState extends State<Home> {
                   ),
                 ),
                 const Text("W\u2219m\u207B\u00B2",
-                    style: TextStyle(fontSize: 18)),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 90,
-          width: 700,
-          child: Card(
-            child: Column(
-              children: <Widget>[
-                const Text(
-                  "ピーク光強度",
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                  _peekPower * 1000 < 1
-                      ? _peekPower.toStringAsExponential(3)
-                      : _peekPower.toStringAsPrecision(4),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 28,
-                    color: Colors.blue.shade600,
-                  ),
-                ),
-                const Text("W\u2219m\u207B\u00B2\u2219nm\u207B\u00B9",
                     style: TextStyle(fontSize: 16)),
               ],
             ),
           ),
         ),
+        SizedBox(
+          height: 120,
+          width: 700,
+          child: Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                const Text(
+                  "積算照度",
+                  style: TextStyle(fontSize: 16),
+                ),
+                Text(
+                  _accumulatedIrradiance * 1000 < 1
+                      ? _accumulatedIrradiance.toStringAsExponential(3)
+                      : _accumulatedIrradiance.toStringAsPrecision(4),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 36,
+                    color: Colors.blue.shade600,
+                  ),
+                ),
+                const Text("J\u2219m\u207B\u00B2",
+                    style: TextStyle(fontSize: 16)),
+                Text("積算時間" + _integ.toString() + "Sec",
+                    style: const TextStyle(fontSize: 16))
+              ],
+            ),
+          ),
+        ),
+        // SizedBox(
+        //   height: 90,
+        //   width: 700,
+        //   child: Card(
+        //     child: Column(
+        //       children: <Widget>[
+        //         const Text(
+        //           "ピーク光強度",
+        //           style: TextStyle(
+        //             fontSize: 16,
+        //           ),
+        //         ),
+        //         Text(
+        //           _peekPower * 1000 < 1
+        //               ? _peekPower.toStringAsExponential(3)
+        //               : _peekPower.toStringAsPrecision(4),
+        //           style: TextStyle(
+        //             fontWeight: FontWeight.bold,
+        //             fontSize: 28,
+        //             color: Colors.blue.shade600,
+        //           ),
+        //         ),
+        //         const Text("W\u2219m\u207B\u00B2\u2219nm\u207B\u00B9",
+        //             style: TextStyle(fontSize: 16)),
+        //       ],
+        //     ),
+        //   ),
+        // ),
         SizedBox(
           height: 90,
           width: 700,
@@ -414,6 +448,12 @@ class SpectralLineChart extends StatelessWidget {
       primaryMeasureAxis: const charts.NumericAxisSpec(
           renderSpec: charts.NoneRenderSpec(), showAxisLine: false),
       behaviors: [
+        charts.ChartTitle('nm',
+              titleStyleSpec: const charts.TextStyleSpec(
+                  color: charts.MaterialPalette.white, fontSize: 15),
+              innerPadding: 0,
+              behaviorPosition: charts.BehaviorPosition.bottom,
+              titleOutsideJustification: charts.OutsideJustification.end),
         charts.RangeAnnotation([
           charts.LineAnnotationSegment(
             sumRangeMin, charts.RangeAnnotationAxisType.domain,
