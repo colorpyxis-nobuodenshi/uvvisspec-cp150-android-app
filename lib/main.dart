@@ -194,7 +194,7 @@ class HomeState extends State<Home> {
           ),
         ),
         SizedBox(
-          height: 120,
+          height: 130,
           width: 700,
           child: Card(
             child: Column(

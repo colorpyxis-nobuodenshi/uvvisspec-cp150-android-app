@@ -33,7 +33,7 @@ class Settings {
   double sumRangeMin = 330;
   double sumRangeMax = 800;
   String deviceExposureTime = "AUTO";
-  int integ = 10;
+  int integ = 1;
 }
 
 // enum Unit {
