@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:async';
@@ -83,7 +84,7 @@ class UVVisSpecResultConverter {
   }
 }
 
-//
+
 class UVVisSpecDeviceResult {
   List<double> sp = [];
   List<double> wl = [];

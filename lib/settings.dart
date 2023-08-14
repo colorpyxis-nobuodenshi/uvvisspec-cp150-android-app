@@ -1,5 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'uvvisspec.dart';
+
+  class NumericRangeFormatter extends TextInputFormatter {
+ 
+    final int min;
+    final int max;
+ 
+    NumericRangeFormatter({required this.min, required this.max});
+ 
+    @override
+    TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+    ) {
+      if (newValue.text.isEmpty) {
+        return newValue;
+      }
+ 
+      final newValueNumber = int.tryParse(newValue.text);
+ 
+      if (newValueNumber == null) {
+        return oldValue;
+      }
+ 
+      if (newValueNumber < min) {
+        return newValue.copyWith(text: min.toString());
+      } else if (newValueNumber > max) {
+        return newValue.copyWith(text: max.toString());
+      } else {
+        return newValue;
+      }
+    }
+  }
 
 class SettingsPage extends StatefulWidget {
   //const SettingsPage({Key? key}) : super(key: key);
@@ -91,8 +124,7 @@ class SettingsPageState extends State<SettingsPage> {
                             ElevatedButton(
                               child: const Text('リセット'),
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.blueGrey,
-                                onPrimary: Colors.white,
+                                foregroundColor: Colors.white, backgroundColor: Colors.blueGrey,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -149,7 +181,9 @@ class SettingsPageState extends State<SettingsPage> {
                           controller: _integTec,
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
-                          //onChanged: (value) => _integ = value,
+                          inputFormatters: [
+                            NumericRangeFormatter(min: 1, max: 600)
+                          ],
                         ),
                         const Text("Sec")
                       ],

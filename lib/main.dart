@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
@@ -37,10 +38,11 @@ class HomeState extends State<Home> {
   final UvVisSpecDevice device = UvVisSpecDevice();
   final UVVisSpecResultConverter resultConverter = UVVisSpecResultConverter();
 
-  var _peekPower = 0.0;
+  //var _peekPower = 0.0;
   var _peekWavelength = 0.0;
   var _irradiance = 0.0;
   var _accumulatedIrradiance = 0.0;
+  final Queue<double> _irradianceQueue = Queue();
   var _integ = 1;
   late List<double> _spectralData = List.generate(50, (index) => 1.0);
   late List<double> _spectralWl = List.generate(50, (index) => 0.0);
@@ -48,7 +50,7 @@ class HomeState extends State<Home> {
   var _settings = Settings();
   var _showWarning = true;
   var _measuring = false;
-  var _connected = false;
+  //var _connected = false;
 
   @override
   void initState() {
@@ -77,7 +79,7 @@ class HomeState extends State<Home> {
         SystemNavigator.pop();
       }
       setState(() {
-        _connected = event.connected;
+        //_connected = event.connected;
         _measuring = event.measurestarted;
 
         if (event.devicewarn || event.deviceerror) {
@@ -95,7 +97,15 @@ class HomeState extends State<Home> {
       var pp1 = _currentResult.pp;
       var ir1 = _currentResult.ir;
       var pwl1 = _currentResult.pwl;
-      var ai = _currentResult.ai;
+      //var ai = _currentResult.ai;
+      if(_irradianceQueue.length == _integ) {
+        _irradianceQueue.removeFirst();
+      }
+      _irradianceQueue.add(ir1);
+      var ai = _irradianceQueue.length == _integ ? 
+        _irradianceQueue.reduce((value, element) => value + element) : 
+        0.0;
+      
       for (var i = 0; i < p1.length; i++) {
         p1[i] /= pp1;
       }
@@ -104,7 +114,7 @@ class HomeState extends State<Home> {
         _spectralWl = wl1;
         _irradiance = ir1;
         _peekWavelength = pwl1;
-        _peekPower = pp1;
+        //_peekPower = pp1;
         _accumulatedIrradiance = ai;
       });
     });
@@ -150,6 +160,8 @@ class HomeState extends State<Home> {
               if (_settings.deviceExposureTime != prevExp) {
                 await device.changeExposureTime(_settings.deviceExposureTime);
               }
+
+              _irradianceQueue.clear();
 
               await device.measStart();
             },
@@ -216,7 +228,7 @@ class HomeState extends State<Home> {
                 ),
                 const Text("J\u2219m\u207B\u00B2",
                     style: TextStyle(fontSize: 16)),
-                Text("積算時間" + _integ.toString() + "Sec",
+                Text("積算時間 " + _integ.toString() + " Sec",
                     style: const TextStyle(fontSize: 16))
               ],
             ),
@@ -340,11 +352,14 @@ class HomeState extends State<Home> {
 
                       Navigator.of(context).pop();
                     }
+
+                    _irradianceQueue.clear();
+
                     await device.measStart();
                   },
                   child: const Text("DARK"),
                   style: ElevatedButton.styleFrom(
-                      shape: const StadiumBorder(), primary: Colors.white30),
+                      shape: const StadiumBorder(), backgroundColor: Colors.white30),
                 ),
               ),
               SizedBox(
@@ -357,13 +372,14 @@ class HomeState extends State<Home> {
                       await device.measStop();
                       return;
                     }
+
+                    _irradianceQueue.clear();
+
                     await device.measStart();
                   },
                   child: !_measuring ? const Text("MEAS") : const Text("HOLD"),
                   style: ElevatedButton.styleFrom(
-                      shape: const StadiumBorder(),
-                      primary:
-                          !_measuring ? Colors.green : Colors.blue.shade800),
+                      shape: const StadiumBorder(), backgroundColor: !_measuring ? Colors.green : Colors.blue.shade800),
                 ),
               ),
               SizedBox(
@@ -383,7 +399,7 @@ class HomeState extends State<Home> {
                   },
                   child: const Text("STORE"),
                   style: ElevatedButton.styleFrom(
-                      shape: const StadiumBorder(), primary: Colors.orange),
+                      shape: const StadiumBorder(), backgroundColor: Colors.orange),
                 ),
               ),
             ],
