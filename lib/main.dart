@@ -112,10 +112,10 @@ class HomeState extends State<Home> {
       setState(() {
         _spectralData = p1;
         _spectralWl = wl1;
-        _irradiance = ir1;
+        _irradiance = ir1 * 100;
         _peekWavelength = pwl1;
         //_peekPower = pp1;
-        _accumulatedIrradiance = ai;
+        _accumulatedIrradiance = ai * 100;
       });
     });
 
@@ -190,17 +190,22 @@ class HomeState extends State<Home> {
                   style: TextStyle(fontSize: 16),
                 ),
                 Text(
-                  _irradiance * 1000 < 1
-                      ? _irradiance.toStringAsExponential(3)
-                      : _irradiance.toStringAsPrecision(4),
+                  // _irradiance > 1000
+                  //     ? _irradiance.toStringAsExponential(3)
+                  //     : _irradiance.toStringAsPrecision(4),
+                  _irradiance >= 1000 ? (_irradiance / 1000).toStringAsPrecision(4) :
+                  _irradiance >= 1000000 ? (_irradiance / 1000000).toStringAsPrecision(4) :
+                  _irradiance.toStringAsPrecision(4),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 36,
                     color: Colors.blue.shade600,
                   ),
                 ),
-                const Text("W\u2219m\u207B\u00B2",
-                    style: TextStyle(fontSize: 16)),
+                Text(_irradiance >= 1000 ? "mW\u2219cm\u207B\u00B2" : 
+                      _irradiance >= 1000000 ? "W\u2219cm\u207B\u00B2" :
+                      "\u00B5W\u2219cm\u207B\u00B2",
+                    style: const TextStyle(fontSize: 16)),
               ],
             ),
           ),
@@ -217,17 +222,22 @@ class HomeState extends State<Home> {
                   style: TextStyle(fontSize: 16),
                 ),
                 Text(
-                  _accumulatedIrradiance * 1000 < 1
-                      ? _accumulatedIrradiance.toStringAsExponential(3)
-                      : _accumulatedIrradiance.toStringAsPrecision(4),
+                  // _accumulatedIrradiance > 1000 
+                  //     ? _accumulatedIrradiance.toStringAsExponential(3)
+                  //     : _accumulatedIrradiance.toStringAsPrecision(4),
+                  _accumulatedIrradiance >= 1000 ? (_accumulatedIrradiance / 1000).toStringAsPrecision(4) :
+                  _accumulatedIrradiance >= 1000000 ? (_accumulatedIrradiance / 1000000).toStringAsPrecision(4) :
+                  _accumulatedIrradiance.toStringAsPrecision(4),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 36,
                     color: Colors.blue.shade600,
                   ),
                 ),
-                const Text("J\u2219m\u207B\u00B2",
-                    style: TextStyle(fontSize: 16)),
+                Text(_accumulatedIrradiance >= 1000 ? "mJ\u2219cm\u207B\u00B2" :
+                      _accumulatedIrradiance >= 1000000 ? "J\u2219cm\u207B\u00B2"
+                      : "\u00B5J\u2219cm\u207B\u00B2",
+                    style: const TextStyle(fontSize: 16)),
                 Text("積算時間 " + _integ.toString() + " Sec",
                     style: const TextStyle(fontSize: 16))
               ],

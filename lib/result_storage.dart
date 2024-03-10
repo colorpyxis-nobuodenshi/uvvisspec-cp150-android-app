@@ -19,11 +19,11 @@ class ResultStorage{
       final mdt = result.measureDatetime;
       final pp = result.pp;
       final pw = result.pwl;
-      await file.writeAsString('測定日, $mdt\r\n', mode: FileMode.append);
-      await file.writeAsString('波長[nm], 放射照度[W/m^-2]\r\n', mode: FileMode.append);
+      await file.writeAsString('\uFEFF測定日, $mdt\r\n', mode: FileMode.append);
+      await file.writeAsString('\uFEFF波長[nm], \uFEFF放射照度[uW/cm^-2]\r\n', mode: FileMode.append);
       for(var i=0;i<len;i++){
         final v1 = wl[i];
-        final v2 = sp[i];
+        final v2 = sp[i] * 100;
         var contents = '$v1,$v2\r\n';
         await file.writeAsString(contents, mode: FileMode.append);
       }
