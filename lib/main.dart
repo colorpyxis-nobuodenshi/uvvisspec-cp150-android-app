@@ -137,6 +137,8 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: const Text('UVaVIS分光放射照度計CP150'),
@@ -172,15 +174,15 @@ class HomeState extends State<Home> {
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
               Widget>[
         SizedBox(
-            width: 700,
-            height: 250,
+            width: width,
+            height: height / 100 * 30,
             child: Card(
               child: SpectralLineChart.create(_spectralWl, _spectralData,
                   _settings.sumRangeMin, _settings.sumRangeMax),
             )),
         SizedBox(
-          height: 120,
-          width: 700,
+          height: height / 100 * 15,
+          width: width,
           child: Card(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -211,8 +213,8 @@ class HomeState extends State<Home> {
           ),
         ),
         SizedBox(
-          height: 130,
-          width: 700,
+          height: height / 100 * 13,
+          width: width,
           child: Card(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -273,8 +275,8 @@ class HomeState extends State<Home> {
         //   ),
         // ),
         SizedBox(
-          height: 90,
-          width: 700,
+          height: height / 100 * 13,
+          width: width,
           child: Card(
             child: Column(
               children: <Widget>[

@@ -237,7 +237,22 @@ class SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ],
-              )
+              ),
+              Card(
+                child: ListTile(
+                  title: const Text("このアプリの情報について"),
+                  onTap: (){
+                    showLicensePage(
+                      context: context,
+                      applicationName: "分光放射照度計CP150",
+                      applicationVersion: "1.0.0",
+                      // applicationIcon: MyAppIcon(),
+                      applicationLegalese:
+                          "\u{a9} 2023 NOBUO ELECTRONICS CO., LTD.",
+                    );
+                },
+              ),
+            ),
             ],
           ),
         ),
